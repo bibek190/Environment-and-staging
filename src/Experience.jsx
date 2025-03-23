@@ -20,13 +20,11 @@ export default function Experience() {
 
   return (
     <>
-      <BakeShadows />
-      <SoftShadows size={25} samples={10} focus={0} />
       <color args={["ivory"]} attach="background" />
 
       <Perf position="top-left" />
 
-      <OrbitControls makeDefault />
+      <OrbitControls />
 
       <directionalLight
         ref={directionalLightRef}
