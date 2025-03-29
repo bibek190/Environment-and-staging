@@ -1,17 +1,11 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import {
-  AccumulativeShadows,
   BakeShadows,
   ContactShadows,
   Environment,
-  Lightformer,
-  Line,
   OrbitControls,
-  RandomizedLight,
-  Sky,
-  SoftShadows,
-  Stage,
   useHelper,
+  useTexture,
 } from "@react-three/drei";
 import { useEffect, useRef } from "react";
 import { Perf } from "r3f-perf";
@@ -22,22 +16,24 @@ export default function Experience() {
   const scene = useThree((state) => state.scene);
 
   const cube = useRef();
+  const sphere = useRef();
+
+  const sphereTexture = useTexture("./textures/rock_wall_12_diff_1k.jpg");
+  const cubeTexture = useTexture("./cubeTexture/dark_brick_wall_diff_1k.jpg");
 
   const directionalLightRef = useRef();
   useHelper(directionalLightRef, THREE.DirectionalLightHelper, 2);
 
   useFrame((state, delta) => {
     cube.current.rotation.y += delta * 0.2;
+    const time = state.clock.getElapsedTime();
+    sphere.current.position.y = Math.sin(time * 1.5) + 2;
   });
 
   const { color, opacity, blur } = useControls("Contact Shadow", {
     color: { value: "#4b2709" },
     opacity: { value: 0.4, min: 0, max: 5, step: 0.01 },
     blur: { value: 2.8, min: 0, max: 4, step: 0.01 },
-  });
-
-  const { sunPosition } = useControls("sky", {
-    sunPosition: { value: [1, 2, 3] },
   });
 
   const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
@@ -53,24 +49,6 @@ export default function Experience() {
 
   return (
     <>
-      {/* <Environment
-        preset="sunset"
-        ground={{
-          height: envMapHeight,
-          radius: envMapRadius,
-          scale: envMapScale,
-        }}
-      >
-        {/* <color args={["#000000"]} attach="background" />
-        <Lightformer
-          position-z={-5}
-          scale={5}
-          color="red"
-          intensity={10}
-          form="ring"
-        /> */}
-      {/* </Environment> */} */}
-      {/* <Sky sunPosition={sunPosition} /> */}
       <BakeShadows />
       <Perf position="top-left" />
       <color args={["ivory"]} attach="background" />
@@ -85,31 +63,7 @@ export default function Experience() {
         blur={blur}
         frames={1000}
       />
-      {/* <directionalLight
-        castShadow
-        ref={directionalLightRef}
-        position={sunPosition}
-        intensity={1.5}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-near={1}
-        shadow-camera-far={10}
-        shadow-camera-top={5}
-        shadow-camera-right={5}
-        shadow-camera-bottom={-5}
-        shadow-camera-left={-5}
-      />{" "} */}
-      // */}
-      {/* <ambientLight intensity={1.5} /> */}
-      {/* <Stage
-        shadows={{
-          type: "contact",
-          opacity: 0.9,
-          blur: 3,
-        }}
-        environment="sunset"
-        preset="portrait"
-        intensity={2}
-      > */}
+
       <Environment
         preset="city"
         ground={{
@@ -118,19 +72,14 @@ export default function Experience() {
           scale: envMapScale,
         }}
       />
-      <mesh position-x={-2} position-y={1} castShadow>
+      <mesh ref={sphere} position-x={-2} position-y={1} castShadow>
         <sphereGeometry />
-        <meshStandardMaterial color="orange" />
+        <meshStandardMaterial color="blue" map={sphereTexture} />
       </mesh>
       <mesh ref={cube} position-x={2} position-y={1} scale={1.5} castShadow>
         <boxGeometry />
-        <meshStandardMaterial color="mediumpurple" />
+        <meshStandardMaterial color="brown" map={cubeTexture} />
       </mesh>
-      {/* </Stage> */}
-      {/* <mesh position-y={0} rotation-x={-Math.PI * 0.5} scale={10} receiveShadow>
-        <planeGeometry />
-        <meshStandardMaterial color="greenyellow" />
-      </mesh> */}
     </>
   );
 }
